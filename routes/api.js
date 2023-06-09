@@ -10,56 +10,57 @@ module.exports = function (app) {
     .post((req, res) => {
       const { puzzle, coordinate, value } = req.body;
 
-      if (!puzzle || !coordinate || !value) {
+      if (!puzzle || !coordinate | !value) {
         res.json({ error: 'Required field(s) missing' });
         return;
       }
 
-      const row = coordinate.split('')[0];
-      const column = coordinate.split('')[1];
-
-      if (coordinate.length !== 2 || !/[a-i]/gi.test(row) || !/1-9]/g.test(column)) {
-        res.json({ error: 'Invalid coordinate' });
-        return;
-      }
-
-      if (!/[1-9]/g.test(value)) {
-        res.json({ error: 'Invalid value' });
-        return;
-      }
-
-      if (/[^\d\.]/g.test(puzzle)) {
+      if (!solver.checkCharacters(puzzle)) {
         res.json({ error: 'Invalid characters in puzzle' });
         return;
       }
 
-      if (puzzle.length !== 81) {
+      if (!solver.checkLength(puzzle)) {
         res.json({ error: 'Expected puzzle to be 81 characters long' });
         return;
       }
 
-      let validRow = solver.checkRowPlacement(puzzle, row, column, value);
-      let validCol = solver.checkColPlacement(puzzle, row, column, value);
-      let validReg = solver.checkRegionPlacement(puzzle, row, column, value);
+      let validCoordinate = solver.checkCoordinate(coordinate);
+      let validValue = solver.checkValue(value);
+
+      if (!validCoordinate) {
+        res.json({ error: 'Invalid coordinate' });
+        return;
+      }
+
+      if (!validValue) {
+        res.json({ error: 'Invalid value' });
+        return;
+      }
+
+      let row = coordinate.split('')[0];
+      let col = coordinate.split('')[1];
+
+      let validRow = solver.checkRowPlacement(puzzle, row, col, value);
+      let validCol = solver.checkColPlacement(puzzle, row, col, value);
+      let validReg = solver.checkRegPlacement(puzzle, row, col, value);
 
       let conflicts = [];
 
-      if (validRow || validCol || validReg) {
+      if (validRow && validCol && validReg) {
         res.json({ valid: true });
       } else {
         if (!validRow) {
           conflicts.push('row');
         }
-
         if (!validCol) {
           conflicts.push('column');
         }
-
         if (!validReg) {
           conflicts.push('region');
         }
 
-        res.json({ valid: false, conflict: conflicts});
+        res.json({ valid: false, conflict: conflicts });
       }
     });
 
@@ -68,26 +69,26 @@ module.exports = function (app) {
       const { puzzle } = req.body;
 
       if (!puzzle) {
-        res.json({ error: 'Required field(s) missing' });
+        res.json({ error: 'Required field missing' });
         return;
       }
 
-      if (puzzle.length !== 81) {
+      if (!solver.checkLength(puzzle)) {
         res.json({ error: 'Expected puzzle to be 81 characters long' });
         return;
       }
 
-      if (/[^\d\.]/g.test(puzzle)) {
+      if (!solver.checkCharacters(puzzle)) {
         res.json({ error: 'Invalid characters in puzzle' });
         return;
       }
 
-      let solvedString = solver.solve(puzzle);
+      let solution = solver.solve(puzzle);
 
-      if (!solvedString) {
+      if (!solution) {
         res.json({ error: 'Puzzle cannot be solved' });
       } else {
-        res.json({ solution: solvedString });
+        res.json({ solution });
       }
     });
 };
