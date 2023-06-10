@@ -1,3 +1,7 @@
 # Sudoku Solver
 
-This is the boilerplate for the Sudoku Solver project. Instructions to complete your project can be found at https://www.freecodecamp.org/learn/quality-assurance/quality-assurance-projects/sudoku-solver
+written using Express and Node.js.
+
+Tested with Mocha and Chai.
+
+Get help with your sudoku [here](https://fcc-qa-04-sudoku-solver.evg13ny.repl.co).
