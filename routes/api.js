@@ -43,7 +43,7 @@ module.exports = function (app) {
 
       let validRow = solver.checkRowPlacement(puzzle, row, col, value);
       let validCol = solver.checkColPlacement(puzzle, row, col, value);
-      let validReg = solver.checkRegPlacement(puzzle, row, col, value);
+      let validReg = solver.checkRegionPlacement(puzzle, row, col, value);
 
       let conflicts = [];
 
